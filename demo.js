@@ -18,6 +18,8 @@ const itemString = (
 const items = itemString.split('\n')
 console.log(items)
 items.sort()
+import {parse} from './index.js' 
+for (const x of items) parse(x)
 console.log(items)
 
 if (items.join('\n') !== itemString) throw Error('sort changed order')
