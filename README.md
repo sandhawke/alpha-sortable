@@ -15,14 +15,16 @@ Encode/decode numbers in strings so that they sort properly
 
 A few examples (more below):
 
-|Number|Encoded {length: 4}|
+|Number|Encoded with default setting {length: 4}|
 |------|-------|
 |1|0001|
 |10|0010|
 |100|0100|
 |1000|1000|
 |10000|E5-10000|
+|100000000|E9-100000000|  
 |1000000000|EE10-1000000000|
+|1e+100|EEE101-10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000|
 
 ## API
 
