@@ -1,0 +1,32 @@
+{
+  "type": "module",
+  "name": "alpha-sortable",
+  "version": "0.0.0",
+  "description": "Encode/decode numbers in strings so that they sort properly",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx standard && NODE_OPTIONS=--experimental-vm-modules npx jest --coverage",
+    "jest": "NODE_OPTIONS=--experimental-vm-modules npx jest"
+  },
+  "jest": {
+    "transform": {}
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sandhawke/alpha-sortable.git"
+  },
+  "keywords": [
+    "sandhawke"
+  ],
+  "author": "Sandro Hawke (http://hawke.org/sandro)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sandhawke/alpha-sortable/issues"
+  },
+  "homepage": "https://github.com/sandhawke/alpha-sortable#readme",
+  "dependencies": {
+    "debug": "^4.3.1"
+  },
+  "devDependencies": {
+  }
+}
