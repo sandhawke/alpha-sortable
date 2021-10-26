@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "alpha-sortable",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Encode/decode numbers in strings so that they sort properly",
   "main": "index.js",
   "scripts": {
