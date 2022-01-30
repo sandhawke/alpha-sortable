@@ -6,17 +6,27 @@ export const BadSyntax = createError('BadSyntax', SyntaxError)
 
 const debug = new Debug('alpha-sortable')
 
+function pad (n, len) {
+  const s = n.toString()
+  return '0'.repeat(len - s.length) + s
+}
 export function stringify (n, { length } = { length: 4 }) {
-  if (n < 0) {
-    if (n < Number.MIN_SAFE_INTEGER) throw OutOfRange('cannot serialize numbers below ' + Number.MIN_SAFE_INTEGER)
-    if (n !== Math.floor(n)) throw OutOfRange('cannot serialize non-integers')
-    const v = n - Number.MIN_SAFE_INTEGER
-    return '-M+' + v
-  }
-  
   const nn = BigInt(n) // throws if non-integer
-  if (nn < 0) throw new OutOfRange('cannot serialize negative numbers', { n })
   if (length < 0) throw OutOfRange('length must be at least 0', { length })
+
+  if (nn < 0) {
+    const ns = nn.toString()
+    const nexp = ns.length
+    const len = nexp - 1
+    const offset = 10n ** BigInt(len)
+    const newVal = nn + offset
+    const padded = pad(newVal, len)
+    const invlen = 100-len
+    if (invlen < 1) throw OutOfRange('negative number too low')
+    const res = '-' + pad(invlen, 2) + '_' + padded
+    console.log({n, nn, len, offset, newVal, padded, res})
+    return res
+  }
 
   const s = nn.toString()
   const exp = s.length
@@ -31,11 +41,20 @@ export function stringify (n, { length } = { length: 4 }) {
 }
 
 export function parse (s, { strict, float } = { strict: true, float: true }) {
-  if (s.startsWith('-M+')) {
-    const v = parseInt(s.slice(3))
-    return Number.MIN_SAFE_INTEGER + v
+  let m = s.match(/\s*-(\d\d)_(\d+)/)
+  if (m) {
+    const [full, invlen, padded] = m
+    const len = 100-invlen
+    if (len !== padded.length) throw Error('wrong len')
+    const offset = 10n ** BigInt(len)
+    const newVal = BigInt(padded)
+    const n = newVal - offset
+    console.log({full, len, offset, newVal, n})
+    if (float && n <= Number.MAX_SAFE_INTEGER) return Number(n)
+    return n
   }
-  const m = s.match(/\s*((=+)(\d+)_)?(\d+)/i)
+  
+  m = s.match(/\s*((=+)(\d+)_)?(\d+)/i)
   if (!m) throw Error('alpha-sortable encoded number not found')
   const [full, lead, es, exp, mant] = m
   // console.log({lead, es, exp, mant})
