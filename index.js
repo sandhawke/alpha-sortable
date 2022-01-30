@@ -7,6 +7,13 @@ export const BadSyntax = createError('BadSyntax', SyntaxError)
 const debug = new Debug('alpha-sortable')
 
 export function stringify (n, { length } = { length: 4 }) {
+  if (n < 0) {
+    if (n < Number.MIN_SAFE_INTEGER) throw OutOfRange('cannot serialize numbers below ' + Number.MIN_SAFE_INTEGER)
+    if (n !== Math.floor(n)) throw OutOfRange('cannot serialize non-integers')
+    const v = n - Number.MIN_SAFE_INTEGER
+    return '=-M+' + v
+  }
+  
   const nn = BigInt(n) // throws if non-integer
   if (nn < 0) throw new OutOfRange('cannot serialize negative numbers', { n })
   if (length < 0) throw OutOfRange('length must be at least 0', { length })
@@ -24,6 +31,10 @@ export function stringify (n, { length } = { length: 4 }) {
 }
 
 export function parse (s, { strict, float } = { strict: true, float: true }) {
+  if (s.startsWith('=-M+')) {
+    const v = parseInt(s.slice(4))
+    return Number.MIN_SAFE_INTEGER + v
+  }
   const m = s.match(/\s*((D+)(\d+)-)?(\d+)/i)
   if (!m) throw Error('alpha-sortable encoded number not found')
   const [full, lead, es, exp, mant] = m

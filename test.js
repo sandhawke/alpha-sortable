@@ -32,7 +32,6 @@ test('stringify length', () => {
 })
      
 test('stringify errors', () => {
-  expect(() => my.stringify(-1)).toThrow(my.OutOfRange)
   expect(() => my.stringify(1, {length: -1})).toThrow(my.OutOfRange)
   expect(() => my.stringify(null)).toThrow(TypeError)
 })
@@ -97,10 +96,23 @@ test('round trip with sorting', () => {
 
 test('times 5', () => {
   const rows = []
+  rows.push({Number: -3, BigInt: BigInt(-3), encoded: my.stringify(-1)})
+  rows.push({Number: -2, BigInt: BigInt(-2), encoded: my.stringify(-1)})
+  rows.push({Number: -1, BigInt: BigInt(-1), encoded: my.stringify(-1)})
   for (let i = 1n; i < 100000000000000000000000000n; i = i * 10n) {
     rows.push({Number: Number(i)-1, BigInt: (i-1n), encoded: my.stringify(i-1n)})
     rows.push({Number: Number(i), BigInt: (i), encoded: my.stringify(i)})
     expect(my.parse(my.stringify(i), {float: false})).toBe(i)
   }
   console.table(rows)
+})
+
+test('negative', () => {
+  const a = [ -1, -10, -2, -20, -1, -15 ]
+  const b = a.map(my.stringify)
+  b.sort()
+  const c = b.map(my.parse)
+  a.sort((x, y) => (x - y))
+  console.log({a, c})
+  expect(a).toEqual(c)
 })
