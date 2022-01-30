@@ -1,5 +1,5 @@
 /* eslint-env jest */
-import * as my from '.'
+import * as my from './index.js'
 import Debug from 'debug'
 
 const debug = new Debug('alpha-sortable/test')
@@ -7,23 +7,23 @@ const debug = new Debug('alpha-sortable/test')
 test('default stringify', () => {
   expect(my.stringify(0)).toBe('0000')
   expect(my.stringify(9999)).toBe('9999')
-  expect(my.stringify(10000)).toBe('D5-10000')
-  expect(my.stringify(999999999)).toBe('D9-999999999')
-  expect(my.stringify(1000000000)).toBe('DD10-1000000000')
+  expect(my.stringify(10000)).toBe('=5_10000')
+  expect(my.stringify(999999999)).toBe('=9_999999999')
+  expect(my.stringify(1000000000)).toBe('==10_1000000000')
 })
 
 test('default stringify bigint', () => {
   expect(my.stringify(0n)).toBe('0000')
   expect(my.stringify(9999n)).toBe('9999')
-  expect(my.stringify(10000n)).toBe('D5-10000')
-  expect(my.stringify(999999999n)).toBe('D9-999999999')
-  expect(my.stringify(1000000000n)).toBe('DD10-1000000000')
-  expect(my.stringify(100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000n)).toBe('DD99-100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
-  expect(my.stringify(1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000n)).toBe('DDD100-1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
+  expect(my.stringify(10000n)).toBe('=5_10000')
+  expect(my.stringify(999999999n)).toBe('=9_999999999')
+  expect(my.stringify(1000000000n)).toBe('==10_1000000000')
+  expect(my.stringify(100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000n)).toBe('==99_100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
+  expect(my.stringify(1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000n)).toBe('===100_1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000')
 })
 
 test('stringify length', () => {
-  expect(my.stringify(1, {length: 0})).toBe('D1-1')
+  expect(my.stringify(1, {length: 0})).toBe('=1_1')
   expect(my.stringify(1, {length: 1})).toBe('1')
   expect(my.stringify(1, {length: 2})).toBe('01')
   expect(my.stringify(1, {length: 3})).toBe('001')
@@ -43,8 +43,8 @@ test('default parse', () => {
   expect(my.parse('1')).toBe(1)
   expect(my.parse('1000000001')).toBe(1000000001)
   expect(my.parse('1000000000000000000000000000001')).toBe(1000000000000000000000000000001n)
-  expect(my.parse('D5-10000')).toBe(10000)
-  expect(my.parse('D9-100000000')).toBe(100000000)
+  expect(my.parse('=5_10000')).toBe(10000)
+  expect(my.parse('=9_100000000')).toBe(100000000)
 })
 
 const samples = [
@@ -94,7 +94,7 @@ test('round trip with sorting', () => {
   }
 })
 
-test('times 5', () => {
+test('a whole bunch of numbers', () => {
   const rows = []
   rows.push({Number: -3, BigInt: BigInt(-3), encoded: my.stringify(-1)})
   rows.push({Number: -2, BigInt: BigInt(-2), encoded: my.stringify(-1)})
@@ -105,6 +105,16 @@ test('times 5', () => {
     expect(my.parse(my.stringify(i), {float: false})).toBe(i)
   }
   console.table(rows)
+  
+  const r1 = [...rows]
+  r1.sort((x, y) => Number(x.BigInt - y.BigInt))
+  // console.log({r1})
+  const r2 = [...rows]
+  // NOPE, localeCompare is weird r2.sort((x, y) => x.encoded.localeCompare(y.encoded))
+  r2.sort((x, y) => x.encoded < y.encoded ? -1 : (x.encoded === y.encoded ? 0 : 1))
+  // console.log({r2})
+  expect(r1).toEqual(r2)
+  expect(rows).toEqual(r1)
 })
 
 test('negative', () => {
@@ -113,6 +123,6 @@ test('negative', () => {
   b.sort()
   const c = b.map(my.parse)
   a.sort((x, y) => (x - y))
-  console.log({a, c})
+  // console.log({a, c})
   expect(a).toEqual(c)
 })

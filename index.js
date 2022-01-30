@@ -11,7 +11,7 @@ export function stringify (n, { length } = { length: 4 }) {
     if (n < Number.MIN_SAFE_INTEGER) throw OutOfRange('cannot serialize numbers below ' + Number.MIN_SAFE_INTEGER)
     if (n !== Math.floor(n)) throw OutOfRange('cannot serialize non-integers')
     const v = n - Number.MIN_SAFE_INTEGER
-    return '=-M+' + v
+    return '-M+' + v
   }
   
   const nn = BigInt(n) // throws if non-integer
@@ -25,26 +25,26 @@ export function stringify (n, { length } = { length: 4 }) {
     res = '0'.repeat(length - exp) + s
   } else {
     const exps = exp.toString()
-    res = 'D'.repeat(exps.length) + exps + '-' + s
+    res = '='.repeat(exps.length) + exps + '_' + s
   }
   return res
 }
 
 export function parse (s, { strict, float } = { strict: true, float: true }) {
-  if (s.startsWith('=-M+')) {
-    const v = parseInt(s.slice(4))
+  if (s.startsWith('-M+')) {
+    const v = parseInt(s.slice(3))
     return Number.MIN_SAFE_INTEGER + v
   }
-  const m = s.match(/\s*((D+)(\d+)-)?(\d+)/i)
+  const m = s.match(/\s*((=+)(\d+)_)?(\d+)/i)
   if (!m) throw Error('alpha-sortable encoded number not found')
   const [full, lead, es, exp, mant] = m
   // console.log({lead, es, exp, mant})
 
   if (lead && strict) {
-    if (es.length !== exp.length) throw Error('alpha-sortable mismatch between number of Ds and digits in exponent')
+    if (es.length !== exp.length) throw Error('alpha-sortable mismatch between number of equal-chars and digits in exponent')
     const expn = parseInt(exp)
     if (expn !== mant.length) throw Error(`alpha-sortable number has ${mant.length} when ${expn} digits were declared`)
-    if (es.match(/e/)) throw Error('alpha-sortable "D" flag must be uppercase')
+    // if (es.match(/e/)) throw Error('alpha-sortable "D" flag must be uppercase')
   }
 
   const n = BigInt(mant)
