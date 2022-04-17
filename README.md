@@ -3,6 +3,8 @@
 
 Encode/decode numbers in strings so that they sort properly
 
+Note: I had not heard of [natural sort order](https://en.wikipedia.org/wiki/Natural_sort_order) when I wrote this. This is a rather different approach. Should be revisited with an eye to Alphanum.
+
 ## Why?
 
 * Because sometimes you want items sorted in numeric order, even though they are sorted on a text field.  Example: filenames.

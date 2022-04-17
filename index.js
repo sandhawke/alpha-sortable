@@ -24,7 +24,7 @@ export function stringify (n, { length } = { length: 4 }) {
     const invlen = 100-len
     if (invlen < 1) throw OutOfRange('negative number too low')
     const res = '-' + pad(invlen, 2) + '_' + padded
-    console.log({n, nn, len, offset, newVal, padded, res})
+    // console.log({n, nn, len, offset, newVal, padded, res})
     return res
   }
 
@@ -49,7 +49,7 @@ export function parse (s, { strict, float } = { strict: true, float: true }) {
     const offset = 10n ** BigInt(len)
     const newVal = BigInt(padded)
     const n = newVal - offset
-    console.log({full, len, offset, newVal, n})
+    // console.log({full, len, offset, newVal, n})
     if (float && n <= Number.MAX_SAFE_INTEGER) return Number(n)
     return n
   }
